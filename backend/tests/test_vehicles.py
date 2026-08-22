@@ -284,3 +284,33 @@ def test_admin_can_delete_a_vehicle():
     assert response.status_code == 204
     remaining = client.get("/api/vehicles", headers=headers)
     assert remaining.json() == []
+
+
+def test_customer_cannot_delete_a_vehicle():
+    admin = admin_headers()
+    created = client.post(
+        "/api/vehicles",
+        headers=admin,
+        json={
+            "make": "Volkswagen",
+            "model": "Taigun",
+            "category": "SUV",
+            "price": 25000,
+            "quantity": 2,
+        },
+    )
+    registration = client.post(
+        "/api/auth/register",
+        json={
+            "name": "Ishaan Roy",
+            "email": "ishaan@example.com",
+            "password": "secure-password-123",
+        },
+    )
+
+    response = client.delete(
+        f"/api/vehicles/{created.json()['id']}",
+        headers={"Authorization": f"Bearer {registration.json()['access_token']}"},
+    )
+
+    assert response.status_code == 403

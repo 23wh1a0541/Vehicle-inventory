@@ -41,3 +41,17 @@ def test_registered_user_can_log_in_and_receive_a_token():
 
     assert response.status_code == 200
     assert response.json()["access_token"]
+
+
+def test_local_frontend_origin_is_allowed_to_send_registration_requests():
+    response = client.options(
+        "/api/auth/register",
+        headers={
+            "Origin": "http://localhost:5174",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://localhost:5174"
