@@ -28,7 +28,8 @@ backend/
   app/          # API routes, database models, schemas, and security
   tests/        # Behaviour-focused API tests
   data/         # Local SQLite database location (database file is ignored by Git)
-frontend/       # React application (in progress)
+frontend/       # React and Tailwind single-page application
+docs/           # Screenshots and test report
 ```
 
 ## Run locally
@@ -69,6 +70,18 @@ cd backend
 
 This adds current, real vehicle models for demonstration. Prices and stock quantities are sample dealership data and are not live offers.
 
+### Frontend setup
+
+In a second terminal, run:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Open the URL printed by Vite, normally `http://127.0.0.1:5173`. Keep the backend running while using the frontend.
+
 ### Run the tests
 
 ```powershell
@@ -76,7 +89,15 @@ cd backend
 ..\.venv\Scripts\python.exe -m pytest -q
 ```
 
-Current result: **12 passing backend tests**. Build the frontend with `cd frontend; npm run build`.
+Run frontend tests and create a production build with:
+
+```powershell
+cd frontend
+npm test
+npm run build
+```
+
+The latest verification results are in [docs/test-report.md](docs/test-report.md).
 
 ## API endpoints implemented
 
@@ -96,12 +117,21 @@ Current result: **12 passing backend tests**. Build the frontend with `cd fronte
 
 Each backend feature is developed in small red-green-refactor cycles. Tests specify observable behavior first, implementation makes the test pass, and the code is then kept clean through refactoring. The Git history documents these focused milestones.
 
+## Screenshots
+
+### Customer dashboard
+
+![Customer dashboard](docs/screenshots/customer-dashboard.png)
+
+### Administrator dashboard
+
+![Administrator dashboard](docs/screenshots/admin-dashboard.png)
+
 ## My AI Usage
 
 I used Codex as a development assistant to discuss the architecture, generate initial test and implementation drafts, and troubleshoot environment issues. I reviewed the generated work, ran the tests after each change, and used the results to guide the next iteration. AI-assisted commits include the required co-author trailer. The raw, unedited interaction record is maintained in `PROMPTS.md` as required by this assignment.
 
-## Planned work
+## Optional next steps
 
-- Frontend interaction tests
-- Database migrations and deployment configuration
-- Application screenshots and a final test report
+- Deploy the frontend and API for a public live demonstration.
+- Configure PostgreSQL and Alembic migrations for production deployment.
