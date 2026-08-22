@@ -81,3 +81,45 @@ def test_authenticated_user_can_view_available_vehicles():
             "quantity": 2,
         }
     ]
+
+
+def test_authenticated_user_can_search_vehicles_by_category_and_price_range():
+    headers = admin_headers()
+    client.post(
+        "/api/vehicles",
+        headers=headers,
+        json={
+            "make": "Toyota",
+            "model": "Fortuner",
+            "category": "SUV",
+            "price": 52000,
+            "quantity": 1,
+        },
+    )
+    client.post(
+        "/api/vehicles",
+        headers=headers,
+        json={
+            "make": "Mahindra",
+            "model": "XUV700",
+            "category": "SUV",
+            "price": 31000,
+            "quantity": 3,
+        },
+    )
+    registration = client.post(
+        "/api/auth/register",
+        json={
+            "name": "Arjun Rao",
+            "email": "arjun@example.com",
+            "password": "secure-password-123",
+        },
+    )
+
+    response = client.get(
+        "/api/vehicles/search?category=SUV&min_price=30000&max_price=40000",
+        headers={"Authorization": f"Bearer {registration.json()['access_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert [vehicle["model"] for vehicle in response.json()] == ["XUV700"]

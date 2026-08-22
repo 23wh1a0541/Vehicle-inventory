@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -72,3 +74,28 @@ def list_vehicles(
     db: Session = Depends(get_db),
 ) -> list[Vehicle]:
     return list(db.scalars(select(Vehicle).order_by(Vehicle.id)))
+
+
+@app.get("/api/vehicles/search", response_model=list[VehicleResponse])
+def search_vehicles(
+    make: str | None = None,
+    model: str | None = None,
+    category: str | None = None,
+    min_price: Decimal | None = None,
+    max_price: Decimal | None = None,
+    _: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[Vehicle]:
+    query = select(Vehicle)
+    if make:
+        query = query.where(Vehicle.make.ilike(f"%{make}%"))
+    if model:
+        query = query.where(Vehicle.model.ilike(f"%{model}%"))
+    if category:
+        query = query.where(Vehicle.category.ilike(f"%{category}%"))
+    if min_price is not None:
+        query = query.where(Vehicle.price >= min_price)
+    if max_price is not None:
+        query = query.where(Vehicle.price <= max_price)
+
+    return list(db.scalars(query.order_by(Vehicle.id)))
