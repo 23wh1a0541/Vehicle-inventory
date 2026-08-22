@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Response, status
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
@@ -15,6 +15,7 @@ from app.schemas import (
     UserResponse,
     VehicleCreate,
     VehicleResponse,
+    VehicleUpdate,
 )
 from app.security import create_access_token, hash_password, verify_password
 
@@ -147,3 +148,36 @@ def restock_vehicle(
     db.commit()
     db.refresh(vehicle)
     return vehicle
+
+
+@app.put("/api/vehicles/{vehicle_id}", response_model=VehicleResponse)
+def update_vehicle(
+    vehicle_id: int,
+    payload: VehicleUpdate,
+    _: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+) -> Vehicle:
+    vehicle = db.get(Vehicle, vehicle_id)
+    if vehicle is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vehicle not found")
+
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(vehicle, field, value)
+    db.commit()
+    db.refresh(vehicle)
+    return vehicle
+
+
+@app.delete("/api/vehicles/{vehicle_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_vehicle(
+    vehicle_id: int,
+    _: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+) -> Response:
+    vehicle = db.get(Vehicle, vehicle_id)
+    if vehicle is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vehicle not found")
+
+    db.delete(vehicle)
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

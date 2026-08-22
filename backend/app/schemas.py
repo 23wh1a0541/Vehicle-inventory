@@ -45,3 +45,11 @@ class VehicleResponse(VehicleCreate):
 
 class RestockRequest(BaseModel):
     quantity: int = Field(gt=0)
+
+
+class VehicleUpdate(BaseModel):
+    make: str | None = Field(default=None, min_length=1, max_length=80)
+    model: str | None = Field(default=None, min_length=1, max_length=80)
+    category: str | None = Field(default=None, min_length=1, max_length=50)
+    price: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
+    quantity: int | None = Field(default=None, ge=0)

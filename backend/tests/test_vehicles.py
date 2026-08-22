@@ -238,3 +238,49 @@ def test_customer_cannot_restock_a_vehicle():
     )
 
     assert response.status_code == 403
+
+
+def test_admin_can_update_vehicle_details():
+    headers = admin_headers()
+    created = client.post(
+        "/api/vehicles",
+        headers=headers,
+        json={
+            "make": "Skoda",
+            "model": "Kushaq",
+            "category": "SUV",
+            "price": 23000,
+            "quantity": 2,
+        },
+    )
+
+    response = client.put(
+        f"/api/vehicles/{created.json()['id']}",
+        headers=headers,
+        json={"price": 24500, "quantity": 4},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["price"] == "24500.00"
+    assert response.json()["quantity"] == 4
+
+
+def test_admin_can_delete_a_vehicle():
+    headers = admin_headers()
+    created = client.post(
+        "/api/vehicles",
+        headers=headers,
+        json={
+            "make": "MG",
+            "model": "Hector",
+            "category": "SUV",
+            "price": 28000,
+            "quantity": 1,
+        },
+    )
+
+    response = client.delete(f"/api/vehicles/{created.json()['id']}", headers=headers)
+
+    assert response.status_code == 204
+    remaining = client.get("/api/vehicles", headers=headers)
+    assert remaining.json() == []
