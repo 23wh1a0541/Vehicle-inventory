@@ -123,3 +123,63 @@ def test_authenticated_user_can_search_vehicles_by_category_and_price_range():
 
     assert response.status_code == 200
     assert [vehicle["model"] for vehicle in response.json()] == ["XUV700"]
+
+
+def test_authenticated_user_can_purchase_a_vehicle_and_reduce_stock():
+    created = client.post(
+        "/api/vehicles",
+        headers=admin_headers(),
+        json={
+            "make": "Tata",
+            "model": "Nexon",
+            "category": "SUV",
+            "price": 20000,
+            "quantity": 2,
+        },
+    )
+    registration = client.post(
+        "/api/auth/register",
+        json={
+            "name": "Neha Patel",
+            "email": "neha@example.com",
+            "password": "secure-password-123",
+        },
+    )
+
+    response = client.post(
+        f"/api/vehicles/{created.json()['id']}/purchase",
+        headers={"Authorization": f"Bearer {registration.json()['access_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["quantity"] == 1
+
+
+def test_purchase_is_rejected_when_vehicle_is_out_of_stock():
+    created = client.post(
+        "/api/vehicles",
+        headers=admin_headers(),
+        json={
+            "make": "Hyundai",
+            "model": "i20",
+            "category": "Hatchback",
+            "price": 14000,
+            "quantity": 0,
+        },
+    )
+    registration = client.post(
+        "/api/auth/register",
+        json={
+            "name": "Kabir Mehta",
+            "email": "kabir@example.com",
+            "password": "secure-password-123",
+        },
+    )
+
+    response = client.post(
+        f"/api/vehicles/{created.json()['id']}/purchase",
+        headers={"Authorization": f"Bearer {registration.json()['access_token']}"},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "Vehicle is out of stock"

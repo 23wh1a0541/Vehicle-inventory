@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from fastapi import Depends, FastAPI, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from app.database import Base, engine, get_db
@@ -99,3 +99,26 @@ def search_vehicles(
         query = query.where(Vehicle.price <= max_price)
 
     return list(db.scalars(query.order_by(Vehicle.id)))
+
+
+@app.post("/api/vehicles/{vehicle_id}/purchase", response_model=VehicleResponse)
+def purchase_vehicle(
+    vehicle_id: int,
+    _: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> Vehicle:
+    vehicle = db.get(Vehicle, vehicle_id)
+    if vehicle is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vehicle not found")
+
+    result = db.execute(
+        update(Vehicle)
+        .where(Vehicle.id == vehicle_id, Vehicle.quantity > 0)
+        .values(quantity=Vehicle.quantity - 1)
+    )
+    if result.rowcount == 0:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Vehicle is out of stock")
+
+    db.commit()
+    db.refresh(vehicle)
+    return vehicle
