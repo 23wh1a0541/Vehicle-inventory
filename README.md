@@ -19,7 +19,7 @@ A full-stack inventory management application for a car dealership. It allows cu
 - **Database:** SQLite for local development, with `DATABASE_URL` support for PostgreSQL deployment
 - **Authentication:** JWT and Argon2 password hashing
 - **Testing:** pytest and FastAPI TestClient
-- **Frontend:** React and Tailwind CSS (in progress)
+- **Frontend:** React, Vite, and Tailwind CSS
 
 ## Project structure
 
@@ -49,6 +49,26 @@ $env:JWT_SECRET = "replace-this-with-a-long-random-secret"
 
 The API will be available at `http://127.0.0.1:8000`. Interactive documentation is available at `http://127.0.0.1:8000/docs`.
 
+### Create a local administrator
+
+Regular registration creates a customer account. To demonstrate inventory management features, create an administrator in a separate terminal:
+
+```powershell
+cd backend
+..\.venv\Scripts\python.exe create_admin.py --name "Inventory Admin" --email "admin@example.com"
+```
+
+The command securely prompts for the password and creates the account (or promotes an existing account).
+
+### Seed demonstration inventory
+
+```powershell
+cd backend
+..\.venv\Scripts\python.exe seed_inventory.py
+```
+
+This adds current, real vehicle models for demonstration. Prices and stock quantities are sample dealership data and are not live offers.
+
 ### Run the tests
 
 ```powershell
@@ -56,7 +76,7 @@ cd backend
 ..\.venv\Scripts\python.exe -m pytest -q
 ```
 
-Current result: **7 passing tests**.
+Current result: **12 passing backend tests**. Build the frontend with `cd frontend; npm run build`.
 
 ## API endpoints implemented
 
@@ -67,7 +87,10 @@ Current result: **7 passing tests**.
 | POST | `/api/vehicles` | Admin | Add a vehicle to inventory |
 | GET | `/api/vehicles` | Authenticated | List inventory |
 | GET | `/api/vehicles/search` | Authenticated | Search and filter inventory |
+| PUT | `/api/vehicles/{id}` | Admin | Update vehicle details |
+| DELETE | `/api/vehicles/{id}` | Admin | Delete a vehicle |
 | POST | `/api/vehicles/{id}/purchase` | Authenticated | Purchase one unit when stock is available |
+| POST | `/api/vehicles/{id}/restock` | Admin | Increase vehicle stock |
 
 ## Development approach
 
@@ -79,8 +102,6 @@ I used Codex as a development assistant to discuss the architecture, generate in
 
 ## Planned work
 
-- Administrator vehicle update, delete, and restock actions
-- React and Tailwind frontend
 - Frontend interaction tests
 - Database migrations and deployment configuration
 - Application screenshots and a final test report
