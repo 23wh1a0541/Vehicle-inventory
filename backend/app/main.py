@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import Base, engine, get_db
-from app.dependencies import require_admin
+from app.dependencies import get_current_user, require_admin
 from app.models import User, Vehicle
 from app.schemas import LoginRequest, RegisterRequest, TokenResponse, UserResponse, VehicleCreate, VehicleResponse
 from app.security import create_access_token, hash_password, verify_password
@@ -64,3 +64,11 @@ def create_vehicle(
     db.commit()
     db.refresh(vehicle)
     return vehicle
+
+
+@app.get("/api/vehicles", response_model=list[VehicleResponse])
+def list_vehicles(
+    _: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[Vehicle]:
+    return list(db.scalars(select(Vehicle).order_by(Vehicle.id)))
