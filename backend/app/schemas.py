@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -25,3 +27,17 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
+
+
+class VehicleCreate(BaseModel):
+    make: str = Field(min_length=1, max_length=80)
+    model: str = Field(min_length=1, max_length=80)
+    category: str = Field(min_length=1, max_length=50)
+    price: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
+    quantity: int = Field(ge=0)
+
+
+class VehicleResponse(VehicleCreate):
+    id: int
+
+    model_config = {"from_attributes": True}

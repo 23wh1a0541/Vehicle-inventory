@@ -3,8 +3,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import Base, engine, get_db
-from app.models import User
-from app.schemas import LoginRequest, RegisterRequest, TokenResponse, UserResponse
+from app.dependencies import require_admin
+from app.models import User, Vehicle
+from app.schemas import LoginRequest, RegisterRequest, TokenResponse, UserResponse, VehicleCreate, VehicleResponse
 from app.security import create_access_token, hash_password, verify_password
 
 
@@ -50,3 +51,16 @@ def login_user(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenRes
         access_token=create_access_token(user.id, user.role),
         user=UserResponse.model_validate(user),
     )
+
+
+@app.post("/api/vehicles", response_model=VehicleResponse, status_code=status.HTTP_201_CREATED)
+def create_vehicle(
+    payload: VehicleCreate,
+    _: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+) -> Vehicle:
+    vehicle = Vehicle(**payload.model_dump())
+    db.add(vehicle)
+    db.commit()
+    db.refresh(vehicle)
+    return vehicle
