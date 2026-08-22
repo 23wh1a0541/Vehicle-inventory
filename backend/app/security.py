@@ -14,6 +14,10 @@ def hash_password(password: str) -> str:
     return password_hash.hash(password)
 
 
+def verify_password(password: str, password_digest: str) -> bool:
+    return password_hash.verify(password, password_digest)
+
+
 def create_access_token(user_id: int, role: str) -> str:
     expires_at = datetime.now(UTC) + timedelta(hours=1)
     return jwt.encode(

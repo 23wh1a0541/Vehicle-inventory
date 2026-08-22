@@ -22,3 +22,22 @@ def test_registering_a_new_user_returns_a_token():
     assert body["token_type"] == "bearer"
     assert body["user"]["email"] == "asha@example.com"
     assert body["user"]["role"] == "customer"
+
+
+def test_registered_user_can_log_in_and_receive_a_token():
+    client.post(
+        "/api/auth/register",
+        json={
+            "name": "Ravi Kumar",
+            "email": "ravi@example.com",
+            "password": "secure-password-123",
+        },
+    )
+
+    response = client.post(
+        "/api/auth/login",
+        json={"email": "ravi@example.com", "password": "secure-password-123"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["access_token"]

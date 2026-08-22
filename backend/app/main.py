@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 
 from app.database import Base, engine, get_db
 from app.models import User
-from app.schemas import RegisterRequest, TokenResponse, UserResponse
-from app.security import create_access_token, hash_password
+from app.schemas import LoginRequest, RegisterRequest, TokenResponse, UserResponse
+from app.security import create_access_token, hash_password, verify_password
 
 
 Base.metadata.create_all(bind=engine)
@@ -33,6 +33,18 @@ def register_user(payload: RegisterRequest, db: Session = Depends(get_db)) -> To
     db.add(user)
     db.commit()
     db.refresh(user)
+
+    return TokenResponse(
+        access_token=create_access_token(user.id, user.role),
+        user=UserResponse.model_validate(user),
+    )
+
+
+@app.post("/api/auth/login", response_model=TokenResponse)
+def login_user(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
+    user = db.scalar(select(User).where(User.email == str(payload.email)))
+    if user is None or not verify_password(payload.password, user.password_hash):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
 
     return TokenResponse(
         access_token=create_access_token(user.id, user.role),
