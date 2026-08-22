@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from fastapi import Depends, FastAPI, HTTPException, Response, status
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
@@ -23,6 +24,13 @@ from app.security import create_access_token, hash_password, verify_password
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Car Dealership Inventory API", version="0.1.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/api/health")
