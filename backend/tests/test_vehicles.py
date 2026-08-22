@@ -183,3 +183,58 @@ def test_purchase_is_rejected_when_vehicle_is_out_of_stock():
 
     assert response.status_code == 409
     assert response.json()["detail"] == "Vehicle is out of stock"
+
+
+def test_admin_can_restock_a_vehicle():
+    headers = admin_headers()
+    created = client.post(
+        "/api/vehicles",
+        headers=headers,
+        json={
+            "make": "Kia",
+            "model": "Seltos",
+            "category": "SUV",
+            "price": 26000,
+            "quantity": 1,
+        },
+    )
+
+    response = client.post(
+        f"/api/vehicles/{created.json()['id']}/restock",
+        headers=headers,
+        json={"quantity": 5},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["quantity"] == 6
+
+
+def test_customer_cannot_restock_a_vehicle():
+    headers = admin_headers()
+    created = client.post(
+        "/api/vehicles",
+        headers=headers,
+        json={
+            "make": "Maruti",
+            "model": "Swift",
+            "category": "Hatchback",
+            "price": 11000,
+            "quantity": 1,
+        },
+    )
+    registration = client.post(
+        "/api/auth/register",
+        json={
+            "name": "Rohan Das",
+            "email": "rohan@example.com",
+            "password": "secure-password-123",
+        },
+    )
+
+    response = client.post(
+        f"/api/vehicles/{created.json()['id']}/restock",
+        headers={"Authorization": f"Bearer {registration.json()['access_token']}"},
+        json={"quantity": 5},
+    )
+
+    assert response.status_code == 403

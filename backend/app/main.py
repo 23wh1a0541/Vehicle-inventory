@@ -7,7 +7,15 @@ from sqlalchemy.orm import Session
 from app.database import Base, engine, get_db
 from app.dependencies import get_current_user, require_admin
 from app.models import User, Vehicle
-from app.schemas import LoginRequest, RegisterRequest, TokenResponse, UserResponse, VehicleCreate, VehicleResponse
+from app.schemas import (
+    LoginRequest,
+    RegisterRequest,
+    RestockRequest,
+    TokenResponse,
+    UserResponse,
+    VehicleCreate,
+    VehicleResponse,
+)
 from app.security import create_access_token, hash_password, verify_password
 
 
@@ -119,6 +127,23 @@ def purchase_vehicle(
     if result.rowcount == 0:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Vehicle is out of stock")
 
+    db.commit()
+    db.refresh(vehicle)
+    return vehicle
+
+
+@app.post("/api/vehicles/{vehicle_id}/restock", response_model=VehicleResponse)
+def restock_vehicle(
+    vehicle_id: int,
+    payload: RestockRequest,
+    _: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+) -> Vehicle:
+    vehicle = db.get(Vehicle, vehicle_id)
+    if vehicle is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vehicle not found")
+
+    vehicle.quantity += payload.quantity
     db.commit()
     db.refresh(vehicle)
     return vehicle

@@ -41,3 +41,7 @@ class VehicleResponse(VehicleCreate):
     id: int
 
     model_config = {"from_attributes": True}
+
+
+class RestockRequest(BaseModel):
+    quantity: int = Field(gt=0)
