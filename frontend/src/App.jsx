@@ -113,9 +113,20 @@ function App() {
   const authenticate = (result) => {
     const next = { token: result.access_token, user: result.user }
     localStorage.setItem('autoline-session', JSON.stringify(next))
+    setError('')
+    setNotice('')
+    setEditing(null)
+    setRestocking(null)
     setSession(next)
   }
-  const signOut = () => { localStorage.removeItem('autoline-session'); setEditing(null); setRestocking(null); setSession(null) }
+  const signOut = () => {
+    localStorage.removeItem('autoline-session')
+    setError('')
+    setNotice('')
+    setEditing(null)
+    setRestocking(null)
+    setSession(null)
+  }
   const loadVehicles = async (activeFilters = filters) => {
     if (!session) return
     setLoading(true); setError('')
