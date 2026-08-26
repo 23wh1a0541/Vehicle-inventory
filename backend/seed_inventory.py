@@ -9,14 +9,14 @@ from app.models import Vehicle
 
 
 INVENTORY = [
-    {"make": "Toyota", "model": "Camry", "category": "Sedan", "price": Decimal("29795.00"), "quantity": 5},
-    {"make": "Honda", "model": "CR-V", "category": "SUV", "price": Decimal("30920.00"), "quantity": 4},
-    {"make": "Hyundai", "model": "IONIQ 5", "category": "Electric", "price": Decimal("42600.00"), "quantity": 3},
-    {"make": "Kia", "model": "Sportage", "category": "SUV", "price": Decimal("27390.00"), "quantity": 6},
-    {"make": "Ford", "model": "F-150", "category": "Truck", "price": Decimal("38710.00"), "quantity": 4},
-    {"make": "Tesla", "model": "Model 3", "category": "Electric", "price": Decimal("42490.00"), "quantity": 3},
-    {"make": "BMW", "model": "3 Series", "category": "Luxury Sedan", "price": Decimal("46400.00"), "quantity": 2},
-    {"make": "Mazda", "model": "CX-5", "category": "SUV", "price": Decimal("28800.00"), "quantity": 5},
+    {"make": "Toyota", "model": "Camry", "category": "Sedan", "price": Decimal("4680000.00"), "quantity": 5},
+    {"make": "Honda", "model": "CR-V", "category": "SUV", "price": Decimal("3520000.00"), "quantity": 4},
+    {"make": "Hyundai", "model": "IONIQ 5", "category": "Electric", "price": Decimal("4605000.00"), "quantity": 3},
+    {"make": "Kia", "model": "Sportage", "category": "SUV", "price": Decimal("2739000.00"), "quantity": 6},
+    {"make": "Ford", "model": "F-150", "category": "Truck", "price": Decimal("3871000.00"), "quantity": 4},
+    {"make": "Tesla", "model": "Model 3", "category": "Electric", "price": Decimal("4249000.00"), "quantity": 3},
+    {"make": "BMW", "model": "3 Series", "category": "Luxury Sedan", "price": Decimal("6200000.00"), "quantity": 2},
+    {"make": "Mazda", "model": "CX-5", "category": "SUV", "price": Decimal("2880000.00"), "quantity": 5},
 ]
 
 

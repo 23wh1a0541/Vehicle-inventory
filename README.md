@@ -68,7 +68,7 @@ cd backend
 ..\.venv\Scripts\python.exe seed_inventory.py
 ```
 
-This adds current, real vehicle models for demonstration. Prices and stock quantities are sample dealership data and are not live offers.
+This adds current, real vehicle models for demonstration. Prices are shown in Indian rupees (INR), and prices and stock quantities are sample dealership data rather than live offers.
 
 ### Frontend setup
 
