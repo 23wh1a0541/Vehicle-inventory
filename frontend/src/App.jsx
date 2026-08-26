@@ -63,8 +63,8 @@ function AuthScreen({ onAuthenticated }) {
   )
 }
 
-function Field({ label, type = 'text', value, onChange, placeholder, min = undefined }) {
-  return <label className="block text-sm font-medium text-slate-700">{label}<input required className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-accent focus:ring-4 focus:ring-orange-100" type={type} min={min} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} /></label>
+function Field({ label, type = 'text', value, onChange, placeholder, min = undefined, max = undefined, step = undefined }) {
+  return <label className="block text-sm font-medium text-slate-700">{label}<input required className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-accent focus:ring-4 focus:ring-orange-100" type={type} min={min} max={max} step={step} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} /></label>
 }
 
 function VehicleForm({ initialValue, onSubmit, submitLabel, onCancel }) {
@@ -79,8 +79,8 @@ function VehicleForm({ initialValue, onSubmit, submitLabel, onCancel }) {
     <Field label="Make" value={form.make} onChange={(value) => update('make', value)} placeholder="Toyota" />
     <Field label="Model" value={form.model} onChange={(value) => update('model', value)} placeholder="Camry" />
     <Field label="Category" value={form.category} onChange={(value) => update('category', value)} placeholder="Sedan" />
-    <Field label="Price (USD)" type="number" min="0.01" value={form.price} onChange={(value) => update('price', value)} placeholder="32000" />
-    <Field label="Quantity" type="number" min="0" value={form.quantity} onChange={(value) => update('quantity', value)} placeholder="1" />
+    <Field label="Price (USD)" type="number" min="0.01" max="99999999.99" step="0.01" value={form.price} onChange={(value) => update('price', value)} placeholder="32000.00" />
+    <Field label="Quantity" type="number" min="0" max="999999" step="1" value={form.quantity} onChange={(value) => update('quantity', value)} placeholder="1" />
     <div className="flex items-end gap-3"><button className="rounded-xl bg-ink px-4 py-3 font-semibold text-white hover:bg-slate-700">{submitLabel}</button>{onCancel && <button type="button" className="px-3 py-3 font-semibold text-slate-600 hover:text-ink" onClick={onCancel}>Cancel</button>}</div>
   </form>
 }

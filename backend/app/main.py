@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from fastapi import Depends, FastAPI, HTTPException, Response, status
+from fastapi import Depends, FastAPI, HTTPException, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
@@ -98,11 +98,14 @@ def search_vehicles(
     make: str | None = None,
     model: str | None = None,
     category: str | None = None,
-    min_price: Decimal | None = None,
-    max_price: Decimal | None = None,
+    min_price: Decimal | None = Query(default=None, ge=0),
+    max_price: Decimal | None = Query(default=None, ge=0),
     _: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> list[Vehicle]:
+    if min_price is not None and max_price is not None and min_price > max_price:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Minimum price cannot exceed maximum price")
+
     query = select(Vehicle)
     if make:
         query = query.where(Vehicle.make.ilike(f"%{make}%"))

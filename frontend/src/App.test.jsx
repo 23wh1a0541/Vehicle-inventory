@@ -48,6 +48,7 @@ describe('Autoline dashboard', () => {
 
     expect(await screen.findByText('Administrator tools')).toBeInTheDocument()
     expect(screen.getByText('Inventory Admin · Administrator')).toBeInTheDocument()
+    expect(screen.getByLabelText('Price (USD)')).toHaveAttribute('step', '0.01')
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Restock' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument()

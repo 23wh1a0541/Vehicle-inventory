@@ -125,6 +125,40 @@ def test_authenticated_user_can_search_vehicles_by_category_and_price_range():
     assert [vehicle["model"] for vehicle in response.json()] == ["XUV700"]
 
 
+def test_vehicle_rejects_blank_text_and_prices_with_more_than_two_decimal_places():
+    response = client.post(
+        "/api/vehicles",
+        headers=admin_headers(),
+        json={
+            "make": "   ",
+            "model": "Camry",
+            "category": "Sedan",
+            "price": "32000.001",
+            "quantity": 1,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_search_rejects_an_invalid_price_range():
+    registration = client.post(
+        "/api/auth/register",
+        json={
+            "name": "Maya Rao",
+            "email": "maya@example.com",
+            "password": "secure-password-123",
+        },
+    )
+
+    response = client.get(
+        "/api/vehicles/search?min_price=50000&max_price=30000",
+        headers={"Authorization": f"Bearer {registration.json()['access_token']}"},
+    )
+
+    assert response.status_code == 422
+
+
 def test_authenticated_user_can_purchase_a_vehicle_and_reduce_stock():
     created = client.post(
         "/api/vehicles",
